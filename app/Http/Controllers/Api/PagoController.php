@@ -160,4 +160,98 @@ class PagoController extends Controller
 
         return response()->json(['message' => 'Pago eliminado y saldo restaurado correctamente.'], 204);
     }
+
+    #[OA\Get(
+        path: '/api/pagos/prestamo/{prestamo_id}',
+        summary: 'Listar pagos por préstamo',
+        description: 'Obtiene todos los pagos asociados a un préstamo específico.',
+        tags: ['Pagos'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+        new OA\Parameter(
+            name: 'prestamo_id',
+            in: 'path',
+            required: true,
+            description: 'ID del préstamo',
+            schema: new OA\Schema(type: 'integer', example: 1)
+        )
+    ],
+        responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Listado de pagos obtenido correctamente',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'status', type: 'string', example: 'success'),
+                    new OA\Property(
+                        property: 'data',
+                        type: 'array',
+                        items: new OA\Items(ref: '#/components/schemas/Pago')
+                    )
+                ]
+            )
+        ),
+        new OA\Response(response: 404, description: 'Préstamo no encontrado'),
+        new OA\Response(response: 401, description: 'No autorizado')
+    ]
+    )]
+    public function pagosPorPrestamo($prestamo_id)
+    {
+        $pagos = Pago::where('prestamo_id', $prestamo_id)->get();
+
+        if ($pagos->isEmpty()) {
+            return response()->json(['status' => 'success', 'message' => 'No hay pagos registrados para este préstamo.']);
+        }
+
+        return response()->json(['status' => 'success', 'data' => $pagos], 200);
+    }
+
+
+    #[OA\Get(
+        path: '/api/pagos/cliente/{cliente_id}',
+        summary: 'Listar pagos por cliente',
+        description: 'Obtiene todos los pagos realizados por un cliente, agrupados por préstamo.',
+        tags: ['Pagos'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+        new OA\Parameter(
+            name: 'cliente_id',
+            in: 'path',
+            required: true,
+            description: 'ID del cliente',
+            schema: new OA\Schema(type: 'integer', example: 1)
+        )
+    ],
+        responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Listado de pagos del cliente obtenido correctamente',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'status', type: 'string', example: 'success'),
+                    new OA\Property(
+                        property: 'data',
+                        type: 'array',
+                        items: new OA\Items(ref: '#/components/schemas/Pago')
+                    )
+                ]
+            )
+        ),
+        new OA\Response(response: 404, description: 'Cliente no encontrado'),
+        new OA\Response(response: 401, description: 'No autorizado')
+    ]
+    )]
+    public function pagosPorCliente($cliente_id)
+    {
+        $pagos = Pago::whereHas('prestamo.solicitud', fn ($q) => $q->where('cliente_id', $cliente_id))
+            ->with('prestamo')
+            ->get();
+
+        if ($pagos->isEmpty()) {
+            return response()->json(['status' => 'success', 'message' => 'El cliente no tiene pagos registrados.']);
+        }
+
+        return response()->json(['status' => 'success', 'data' => $pagos], 200);
+    }
+
 }

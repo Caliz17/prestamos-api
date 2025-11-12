@@ -613,6 +613,120 @@
                 ]
             }
         },
+        "/api/pagos/prestamo/{prestamo_id}": {
+            "get": {
+                "tags": [
+                    "Pagos"
+                ],
+                "summary": "Listar pagos por préstamo",
+                "description": "Obtiene todos los pagos asociados a un préstamo específico.",
+                "operationId": "12121133142360a040a49389c5116ca7",
+                "parameters": [
+                    {
+                        "name": "prestamo_id",
+                        "in": "path",
+                        "description": "ID del préstamo",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado de pagos obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Pago"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Préstamo no encontrado"
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/pagos/cliente/{cliente_id}": {
+            "get": {
+                "tags": [
+                    "Pagos"
+                ],
+                "summary": "Listar pagos por cliente",
+                "description": "Obtiene todos los pagos realizados por un cliente, agrupados por préstamo.",
+                "operationId": "a5b798f3df3b04c24e93edac4f3edd2c",
+                "parameters": [
+                    {
+                        "name": "cliente_id",
+                        "in": "path",
+                        "description": "ID del cliente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado de pagos del cliente obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Pago"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Cliente no encontrado"
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/prestamos": {
             "get": {
                 "tags": [
@@ -783,6 +897,63 @@
                     },
                     "400": {
                         "description": "El préstamo tiene pagos y no puede eliminarse"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/prestamos/cliente/{cliente_id}": {
+            "get": {
+                "tags": [
+                    "Préstamos"
+                ],
+                "summary": "Listar préstamos de un cliente",
+                "description": "Devuelve todos los préstamos asociados a las solicitudes de un cliente.",
+                "operationId": "7754ed7a26d39b39804597ffa910cfe1",
+                "parameters": [
+                    {
+                        "name": "cliente_id",
+                        "in": "path",
+                        "description": "ID del cliente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado de préstamos obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Prestamo"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Cliente no encontrado"
+                    },
+                    "401": {
+                        "description": "No autorizado"
                     }
                 },
                 "security": [
@@ -997,6 +1168,167 @@
                     },
                     "404": {
                         "description": "Solicitud no encontrada"
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/solicitudes/{id}/aprobar": {
+            "put": {
+                "tags": [
+                    "Solicitudes"
+                ],
+                "summary": "Aprobar solicitud",
+                "description": "Cambia el estado de una solicitud a APROBADO.",
+                "operationId": "20d6be21acfaa0cfe8c47d43390231b7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la solicitud a aprobar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Solicitud aprobada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Solicitud aprobada correctamente."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    },
+                    "400": {
+                        "description": "Solicitud ya estaba aprobada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/solicitudes/{id}/rechazar": {
+            "put": {
+                "tags": [
+                    "Solicitudes"
+                ],
+                "summary": "Rechazar solicitud",
+                "description": "Cambia el estado de una solicitud a RECHAZADO.",
+                "operationId": "253c0959b3e16fa22d33a4bcab90f87e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la solicitud a rechazar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Solicitud rechazada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Solicitud rechazada correctamente."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/solicitudes/cliente/{cliente_id}": {
+            "get": {
+                "tags": [
+                    "Solicitudes"
+                ],
+                "summary": "Listar solicitudes por cliente",
+                "description": "Obtiene todas las solicitudes registradas de un cliente específico.",
+                "operationId": "5758b888167eb7777dfa0aa277b0d581",
+                "parameters": [
+                    {
+                        "name": "cliente_id",
+                        "in": "path",
+                        "description": "ID del cliente",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado de solicitudes obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Solicitud"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "401": {
                         "description": "No autorizado"

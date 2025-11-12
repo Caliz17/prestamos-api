@@ -68,10 +68,7 @@ class PrestamoController extends Controller
         $solicitud = Solicitud::find($validated['solicitud_id']);
 
         if ($solicitud->estado !== 'APROBADO') {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'La solicitud debe estar en estado APROBADO para generar un préstamo.'
-            ], 400);
+            $solicitud->update(['estado' => 'APROBADO']);
         }
 
         $prestamo = Prestamo::create([
@@ -86,7 +83,7 @@ class PrestamoController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $prestamo,
+            'message' => 'Préstamo generado correctamente.'
         ], 201);
     }
 
@@ -176,5 +173,53 @@ class PrestamoController extends Controller
 
         $prestamo->delete();
         return response()->json(['message' => 'Préstamo eliminado correctamente'], 204);
+    }
+
+
+    #[OA\Get(
+        path: '/api/prestamos/cliente/{cliente_id}',
+        summary: 'Listar préstamos de un cliente',
+        description: 'Devuelve todos los préstamos asociados a las solicitudes de un cliente.',
+        tags: ['Préstamos'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+        new OA\Parameter(
+            name: 'cliente_id',
+            in: 'path',
+            required: true,
+            description: 'ID del cliente',
+            schema: new OA\Schema(type: 'integer', example: 1)
+        )
+    ],
+        responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Listado de préstamos obtenido correctamente',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'status', type: 'string', example: 'success'),
+                    new OA\Property(
+                        property: 'data',
+                        type: 'array',
+                        items: new OA\Items(ref: '#/components/schemas/Prestamo')
+                    )
+                ]
+            )
+        ),
+        new OA\Response(response: 404, description: 'Cliente no encontrado'),
+        new OA\Response(response: 401, description: 'No autorizado')
+    ]
+    )]
+    public function prestamosPorCliente($cliente_id)
+    {
+        $prestamos = Prestamo::whereHas('solicitud', fn ($q) => $q->where('cliente_id', $cliente_id))
+            ->with('solicitud.cliente')
+            ->get();
+
+        if ($prestamos->isEmpty()) {
+            return response()->json(['status' => 'success', 'message' => 'El cliente no tiene préstamos registrados.']);
+        }
+
+        return response()->json(['status' => 'success', 'data' => $prestamos], 200);
     }
 }

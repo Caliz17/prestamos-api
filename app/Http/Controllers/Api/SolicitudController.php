@@ -211,4 +211,146 @@ class SolicitudController extends Controller
 
         return response()->json(['message' => 'Solicitud eliminada correctamente'], 204);
     }
+
+    #[OA\Put(
+        path: '/api/solicitudes/{id}/aprobar',
+        summary: 'Aprobar solicitud',
+        description: 'Cambia el estado de una solicitud a APROBADO.',
+        tags: ['Solicitudes'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID de la solicitud a aprobar',
+            schema: new OA\Schema(type: 'integer', example: 1)
+        )
+    ],
+        responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Solicitud aprobada correctamente',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'status', type: 'string', example: 'success'),
+                    new OA\Property(property: 'message', type: 'string', example: 'Solicitud aprobada correctamente.')
+                ]
+            )
+        ),
+        new OA\Response(response: 404, description: 'Solicitud no encontrada'),
+        new OA\Response(response: 400, description: 'Solicitud ya estaba aprobada')
+    ]
+    )]
+    public function aprobar($id)
+    {
+        $solicitud = Solicitud::find($id);
+
+        if (!$solicitud) {
+            return response()->json(['status' => 'error', 'message' => 'Solicitud no encontrada.'], 404);
+        }
+
+        if ($solicitud->estado === 'APROBADO') {
+            return response()->json(['status' => 'error', 'message' => 'La solicitud ya fue aprobada.'], 400);
+        }
+
+        $solicitud->update(['estado' => 'APROBADO']);
+
+        return response()->json(['status' => 'success', 'message' => 'Solicitud aprobada correctamente.'], 200);
+    }
+
+
+    #[OA\Put(
+        path: '/api/solicitudes/{id}/rechazar',
+        summary: 'Rechazar solicitud',
+        description: 'Cambia el estado de una solicitud a RECHAZADO.',
+        tags: ['Solicitudes'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+        new OA\Parameter(
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'ID de la solicitud a rechazar',
+            schema: new OA\Schema(type: 'integer', example: 1)
+        )
+    ],
+        responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Solicitud rechazada correctamente',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'status', type: 'string', example: 'success'),
+                    new OA\Property(property: 'message', type: 'string', example: 'Solicitud rechazada correctamente.')
+                ]
+            )
+        ),
+        new OA\Response(response: 404, description: 'Solicitud no encontrada')
+    ]
+    )]
+    public function rechazar($id)
+    {
+        $solicitud = Solicitud::find($id);
+
+        if (!$solicitud) {
+            return response()->json(['status' => 'error', 'message' => 'Solicitud no encontrada.'], 404);
+        }
+
+        $solicitud->update(['estado' => 'RECHAZADO']);
+
+        return response()->json(['status' => 'success', 'message' => 'Solicitud rechazada correctamente.'], 200);
+    }
+
+
+    #[OA\Get(
+        path: '/api/solicitudes/cliente/{cliente_id}',
+        summary: 'Listar solicitudes por cliente',
+        description: 'Obtiene todas las solicitudes registradas de un cliente específico.',
+        tags: ['Solicitudes'],
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(
+                name: 'cliente_id',
+                in: 'path',
+                required: true,
+                description: 'ID del cliente',
+                schema: new OA\Schema(type: 'integer', example: 1)
+            )
+        ],
+        responses: [
+        new OA\Response(
+            response: 200,
+            description: 'Listado de solicitudes obtenido correctamente',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'status', type: 'string', example: 'success'),
+                    new OA\Property(
+                        property: 'data',
+                        type: 'array',
+                        items: new OA\Items(ref: '#/components/schemas/Solicitud')
+                    )
+                ]
+            )
+        ),
+        new OA\Response(response: 401, description: 'No autorizado')
+        ]
+    )]
+    public function solicitudesPorCliente($cliente_id)
+    {
+        $solicitudes = Solicitud::where('cliente_id', $cliente_id)
+            ->with('cliente')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        if ($solicitudes->isEmpty()) {
+            return response()->json(['status' => 'success', 'message' => 'El cliente no tiene solicitudes registradas.']);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $solicitudes
+        ], 200);
+    }
+
 }

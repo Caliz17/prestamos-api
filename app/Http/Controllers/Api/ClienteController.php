@@ -91,24 +91,16 @@ class ClienteController extends Controller
     {
         $validated = $request->validate([
             'primer_nombre' => 'required|string|max:100',
-            'segundo_nombre' => 'nullable|string|max:100',
             'primer_apellido' => 'required|string|max:100',
-            'segundo_apellido' => 'nullable|string|max:100',
-            'dpi' => 'required|string|unique:clientes,dpi|max:20',
-            'nit' => 'required|string|unique:clientes,nit|max:20',
-            'fecha_nacimiento' => 'required|date',
-            'direccion' => 'nullable|string|max:255',
-            'correo' => 'nullable|email|max:100',
-            'telefono' => 'nullable|string|max:20',
+            'dpi' => 'required|string|unique:clientes,dpi',
+            'nit' => 'required|string|unique:clientes,nit',
         ]);
 
-        $validated['usuario_crea'] = auth()->user()->name ?? 'sistema';
-
-        $cliente = Cliente::create($validated);
+        Cliente::create($validated);
 
         return response()->json([
             'status' => 'success',
-            'data' => $cliente,
+            'message' => 'Cliente creado correctamente.'
         ], 201);
     }
 
@@ -170,27 +162,12 @@ class ClienteController extends Controller
         $cliente = Cliente::find($id);
 
         if (!$cliente) {
-            return response()->json(['message' => 'Cliente no encontrado'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Cliente no encontrado.'], 404);
         }
 
-        $validated = $request->validate([
-            'primer_nombre' => 'nullable|string|max:100',
-            'segundo_nombre' => 'nullable|string|max:100',
-            'primer_apellido' => 'nullable|string|max:100',
-            'segundo_apellido' => 'nullable|string|max:100',
-            'dpi' => 'nullable|string|max:20|unique:clientes,dpi,' . $cliente->id,
-            'nit' => 'nullable|string|max:20|unique:clientes,nit,' . $cliente->id,
-            'fecha_nacimiento' => 'nullable|date',
-            'direccion' => 'nullable|string|max:255',
-            'correo' => 'nullable|email|max:100',
-            'telefono' => 'nullable|string|max:20',
-        ]);
+        $cliente->update($request->all());
 
-        $validated['usuario_actualiza'] = auth()->user()->name ?? 'sistema';
-
-        $cliente->update($validated);
-
-        return response()->json(['status' => 'success', 'data' => $cliente], 200);
+        return response()->json(['status' => 'success', 'message' => 'Cliente actualizado correctamente.'], 200);
     }
 
     // ============================
@@ -216,11 +193,11 @@ class ClienteController extends Controller
         $cliente = Cliente::find($id);
 
         if (!$cliente) {
-            return response()->json(['message' => 'Cliente no encontrado'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Cliente no encontrado.'], 404);
         }
 
         $cliente->delete();
 
-        return response()->json(['message' => 'Cliente eliminado correctamente'], 204);
+        return response()->json(['status' => 'success', 'message' => 'Cliente eliminado correctamente.'], 200);
     }
 }
