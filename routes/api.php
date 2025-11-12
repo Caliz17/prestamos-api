@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClienteController;
 use App\Http\Controllers\Api\SolicitudController;
 use App\Http\Controllers\Api\PrestamoController;
+use App\Http\Controllers\Api\PagoController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -22,6 +23,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('solicitudes', App\Http\Controllers\Api\SolicitudController::class);
     /* Prestamo resource routes */
     Route::apiResource('prestamos', App\Http\Controllers\Api\PrestamoController::class);
+    /* Pago resource routes */
+    Route::apiResource('pagos', App\Http\Controllers\Api\PagoController::class);
 });
 
 

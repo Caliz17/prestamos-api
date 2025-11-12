@@ -466,6 +466,153 @@
                 ]
             }
         },
+        "/api/pagos": {
+            "get": {
+                "tags": [
+                    "Pagos"
+                ],
+                "summary": "Listar todos los pagos",
+                "description": "Obtiene todos los registros de pagos (requiere autenticación).",
+                "operationId": "c7ad1fa4d08ca21307e22559c4f3c415",
+                "responses": {
+                    "200": {
+                        "description": "Listado de pagos obtenido correctamente"
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Pagos"
+                ],
+                "summary": "Registrar nuevo pago",
+                "description": "Registra un pago asociado a un préstamo y actualiza automáticamente su saldo.",
+                "operationId": "806f319968ae8c844f464f200b893880",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "prestamo_id",
+                                    "monto_pagado",
+                                    "metodo_pago"
+                                ],
+                                "properties": {
+                                    "prestamo_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "monto_pagado": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1000
+                                    },
+                                    "metodo_pago": {
+                                        "type": "string",
+                                        "example": "EFECTIVO"
+                                    },
+                                    "observaciones": {
+                                        "type": "string",
+                                        "example": "Cobro en zona 5, cliente moroso."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Pago registrado correctamente"
+                    },
+                    "404": {
+                        "description": "Préstamo no encontrado"
+                    },
+                    "400": {
+                        "description": "Pago excede el saldo actual"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/pagos/{id}": {
+            "get": {
+                "tags": [
+                    "Pagos"
+                ],
+                "summary": "Ver detalle de pago",
+                "description": "Obtiene los detalles de un pago específico.",
+                "operationId": "7812b6069344467de9374889c795524c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pago encontrado"
+                    },
+                    "404": {
+                        "description": "Pago no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Pagos"
+                ],
+                "summary": "Eliminar pago",
+                "description": "Elimina un pago y restaura el saldo del préstamo.",
+                "operationId": "ee5b1867de37b0a97bc259374489b5d4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Pago eliminado correctamente"
+                    },
+                    "404": {
+                        "description": "Pago no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/prestamos": {
             "get": {
                 "tags": [
@@ -925,6 +1072,50 @@
                 },
                 "type": "object"
             },
+            "Pago": {
+                "required": [
+                    "prestamo_id",
+                    "monto_pagado",
+                    "metodo_pago"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "prestamo_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "fecha_pago": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-11-12T10:00:00Z"
+                    },
+                    "monto_pagado": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1200.5
+                    },
+                    "metodo_pago": {
+                        "type": "string",
+                        "example": "EFECTIVO"
+                    },
+                    "observaciones": {
+                        "type": "string",
+                        "example": "Cobro realizado en ruta norte."
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "Prestamo": {
                 "required": [
                     "solicitud_id",
@@ -1057,6 +1248,10 @@
         {
             "name": "Clientes",
             "description": "Gestión de clientes del sistema"
+        },
+        {
+            "name": "Pagos",
+            "description": "Gestión de pagos de préstamos"
         },
         {
             "name": "Préstamos",
