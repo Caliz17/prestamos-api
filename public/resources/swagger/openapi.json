@@ -234,7 +234,7 @@
                     "Clientes"
                 ],
                 "summary": "Obtener lista de clientes",
-                "description": "Devuelve todos los clientes registrados",
+                "description": "Devuelve todos los clientes registrados (requiere autenticación)",
                 "operationId": "f8eafbc2e9500413091c7f84a4470b84",
                 "responses": {
                     "200": {
@@ -259,10 +259,18 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "No autorizado"
+                    },
                     "500": {
                         "description": "Error del servidor"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/clientes/{id}": {
@@ -271,8 +279,8 @@
                     "Clientes"
                 ],
                 "summary": "Mostrar cliente específico",
-                "description": "Obtiene los datos detallados de un cliente por su identificador.",
-                "operationId": "showCliente",
+                "description": "Obtiene los datos detallados de un cliente por su identificador (requiere autenticación).",
+                "operationId": "7be647ff4c2ab71c5a1f042133b13428",
                 "parameters": [
                     {
                         "name": "id",

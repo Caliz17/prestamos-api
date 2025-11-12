@@ -13,8 +13,9 @@ class ClienteController extends Controller
     #[OA\Get(
         path: '/api/clientes',
         summary: 'Obtener lista de clientes',
-        description: 'Devuelve todos los clientes registrados',
+        description: 'Devuelve todos los clientes registrados (requiere autenticación)',
         tags: ['Clientes'],
+        security: [['bearerAuth' => []]],
         responses: [
             new OA\Response(
                 response: 200,
@@ -30,10 +31,8 @@ class ClienteController extends Controller
                     ]
                 )
             ),
-            new OA\Response(
-                response: 500,
-                description: 'Error del servidor'
-            )
+            new OA\Response(response: 401, description: 'No autorizado'),
+            new OA\Response(response: 500, description: 'Error del servidor')
         ]
     )]
     public function index()
@@ -63,10 +62,10 @@ class ClienteController extends Controller
 
     #[OA\Get(
         path: '/api/clientes/{id}',
-        operationId: 'showCliente',
-        tags: ['Clientes'],
         summary: 'Mostrar cliente específico',
-        description: 'Obtiene los datos detallados de un cliente por su identificador.',
+        description: 'Obtiene los datos detallados de un cliente por su identificador (requiere autenticación).',
+        tags: ['Clientes'],
+        security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(
                 name: 'id',
@@ -113,15 +112,30 @@ class ClienteController extends Controller
                     ]
                 )
             )
-        ],
-        security: [['bearerAuth' => []]]
+        ]
     )]
     public function show(Cliente $cliente)
     {
-        return response()->json([
-            'success' => true,
-            'data' => $cliente
-        ]);
+        try {
+            $cliente = Cliente::find($cliente->id);
+
+            if (!$cliente) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cliente no encontrado'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $cliente,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener el cliente: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
 
