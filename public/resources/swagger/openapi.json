@@ -234,11 +234,11 @@
                     "Clientes"
                 ],
                 "summary": "Obtener lista de clientes",
-                "description": "Devuelve todos los clientes registrados (requiere autenticación)",
+                "description": "Devuelve todos los clientes registrados (requiere autenticación).",
                 "operationId": "f8eafbc2e9500413091c7f84a4470b84",
                 "responses": {
                     "200": {
-                        "description": "Operación exitosa",
+                        "description": "Lista de clientes obtenida correctamente.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -263,7 +263,92 @@
                         "description": "No autorizado"
                     },
                     "500": {
-                        "description": "Error del servidor"
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Crear nuevo cliente",
+                "description": "Registra un nuevo cliente (requiere autenticación).",
+                "operationId": "2a8a28c7aec782e1af95193a65053e68",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "primer_nombre",
+                                    "primer_apellido",
+                                    "dpi",
+                                    "nit",
+                                    "fecha_nacimiento"
+                                ],
+                                "properties": {
+                                    "primer_nombre": {
+                                        "type": "string",
+                                        "example": "Luis"
+                                    },
+                                    "segundo_nombre": {
+                                        "type": "string",
+                                        "example": "Fernando"
+                                    },
+                                    "primer_apellido": {
+                                        "type": "string",
+                                        "example": "Hernández"
+                                    },
+                                    "segundo_apellido": {
+                                        "type": "string",
+                                        "example": "Gómez"
+                                    },
+                                    "dpi": {
+                                        "type": "string",
+                                        "example": "1234567890101"
+                                    },
+                                    "nit": {
+                                        "type": "string",
+                                        "example": "1234567-8"
+                                    },
+                                    "fecha_nacimiento": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1990-05-20"
+                                    },
+                                    "direccion": {
+                                        "type": "string",
+                                        "example": "Ciudad de Guatemala, Zona 1"
+                                    },
+                                    "correo": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "luis@example.com"
+                                    },
+                                    "telefono": {
+                                        "type": "string",
+                                        "example": "5555-1234"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cliente creado correctamente"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    },
+                    "401": {
+                        "description": "No autorizado"
                     }
                 },
                 "security": [
@@ -279,7 +364,7 @@
                     "Clientes"
                 ],
                 "summary": "Mostrar cliente específico",
-                "description": "Obtiene los datos detallados de un cliente por su identificador (requiere autenticación).",
+                "description": "Obtiene los datos de un cliente por su identificador (requiere autenticación).",
                 "operationId": "7be647ff4c2ab71c5a1f042133b13428",
                 "parameters": [
                     {
@@ -289,70 +374,89 @@
                         "required": true,
                         "schema": {
                             "type": "integer",
-                            "format": "int64",
                             "example": 1
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Operación exitosa",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/Cliente"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Cliente encontrado"
                     },
                     "404": {
-                        "description": "Cliente no encontrado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Cliente no encontrado"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
+                        "description": "Cliente no encontrado"
                     },
                     "401": {
-                        "description": "No autorizado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": false
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "example": "No autorizado"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Actualizar cliente",
+                "description": "Modifica los datos de un cliente existente (requiere autenticación).",
+                "operationId": "1cc735d14964cb4b25557d546e807a9c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cliente actualizado correctamente"
+                    },
+                    "404": {
+                        "description": "Cliente no encontrado"
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Eliminar cliente",
+                "description": "Elimina un cliente existente y sus datos relacionados (requiere autenticación).",
+                "operationId": "fae533cf0841c3ece1414287d89ef42b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Cliente eliminado correctamente"
+                    },
+                    "404": {
+                        "description": "Cliente no encontrado"
+                    },
+                    "401": {
+                        "description": "No autorizado"
                     }
                 },
                 "security": [
@@ -441,7 +545,7 @@
         },
         {
             "name": "Clientes",
-            "description": "Gestión de clientes"
+            "description": "Gestión de clientes del sistema"
         }
     ]
 }
