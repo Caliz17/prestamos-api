@@ -9,7 +9,8 @@
         "php": "^8.2",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.2",
-        "laravel/tinker": "^2.10.1"
+        "laravel/tinker": "^2.10.1",
+        "wotz/laravel-swagger-ui": "^1.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -18,7 +19,8 @@
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "phpunit/phpunit": "^11.5.3"
+        "phpunit/phpunit": "^11.5.3",
+        "zircote/swagger-php": "^5.7"
     },
     "autoload": {
         "psr-4": {
@@ -33,6 +35,7 @@
         }
     },
     "scripts": {
+        "swagger": "php vendor/zircote/swagger-php/bin/openapi app -o resources/swagger/openapi.json",
         "setup": [
             "composer install",
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
