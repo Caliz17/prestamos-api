@@ -466,6 +466,185 @@
                 ]
             }
         },
+        "/api/prestamos": {
+            "get": {
+                "tags": [
+                    "Préstamos"
+                ],
+                "summary": "Listar préstamos",
+                "description": "Obtiene todos los préstamos registrados (requiere autenticación).",
+                "operationId": "4ac9692aa94fdf81d7df1072148bb462",
+                "responses": {
+                    "200": {
+                        "description": "Listado de préstamos obtenido correctamente"
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Préstamos"
+                ],
+                "summary": "Crear préstamo (a partir de solicitud aprobada)",
+                "description": "Crea un nuevo préstamo basado en una solicitud previamente aprobada.",
+                "operationId": "2f394cb7b51fad195cc9c2decad984fa",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "solicitud_id",
+                                    "monto_aprobado",
+                                    "tasa_interes",
+                                    "plazo_meses"
+                                ],
+                                "properties": {
+                                    "solicitud_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "monto_aprobado": {
+                                        "type": "number",
+                                        "example": 15000
+                                    },
+                                    "tasa_interes": {
+                                        "type": "number",
+                                        "example": 12.5
+                                    },
+                                    "plazo_meses": {
+                                        "type": "integer",
+                                        "example": 12
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Préstamo creado correctamente"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    },
+                    "400": {
+                        "description": "Solicitud no aprobada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/prestamos/{id}": {
+            "get": {
+                "tags": [
+                    "Préstamos"
+                ],
+                "summary": "Ver préstamo específico",
+                "description": "Obtiene los datos detallados de un préstamo por su ID.",
+                "operationId": "e5355d3cdd0737e0f3fcfb73247fb4cc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Préstamo encontrado"
+                    },
+                    "404": {
+                        "description": "Préstamo no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Préstamos"
+                ],
+                "summary": "Actualizar préstamo",
+                "description": "Actualiza el estado o datos de un préstamo existente.",
+                "operationId": "d08d56c61ffde4f185ef5cd7fc54cfd4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Préstamo actualizado correctamente"
+                    },
+                    "404": {
+                        "description": "Préstamo no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Préstamos"
+                ],
+                "summary": "Eliminar préstamo",
+                "description": "Elimina un préstamo existente (solo si no tiene pagos asociados).",
+                "operationId": "994472194707b1991f1a0c35bc1da7b6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Préstamo eliminado correctamente"
+                    },
+                    "400": {
+                        "description": "El préstamo tiene pagos y no puede eliminarse"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/solicitudes": {
             "get": {
                 "tags": [
@@ -746,6 +925,61 @@
                 },
                 "type": "object"
             },
+            "Prestamo": {
+                "required": [
+                    "solicitud_id",
+                    "monto_aprobado",
+                    "tasa_interes",
+                    "plazo_meses"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "solicitud_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "monto_aprobado": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 15000
+                    },
+                    "fecha_aprobacion": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-11-10T10:00:00Z"
+                    },
+                    "tasa_interes": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 12.5
+                    },
+                    "plazo_meses": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "saldo_actual": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 15000
+                    },
+                    "estado": {
+                        "type": "string",
+                        "example": "ACTIVO"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "Solicitud": {
                 "required": [
                     "cliente_id",
@@ -823,6 +1057,10 @@
         {
             "name": "Clientes",
             "description": "Gestión de clientes del sistema"
+        },
+        {
+            "name": "Préstamos",
+            "description": "Gestión de préstamos y su relación con solicitudes y pagos"
         },
         {
             "name": "Solicitudes",
