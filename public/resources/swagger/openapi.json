@@ -465,6 +465,223 @@
                     }
                 ]
             }
+        },
+        "/api/solicitudes": {
+            "get": {
+                "tags": [
+                    "Solicitudes"
+                ],
+                "summary": "Obtener lista de solicitudes",
+                "description": "Devuelve todas las solicitudes de préstamo registradas (requiere autenticación).",
+                "operationId": "07656bdd4c54e32b2596980ff36ce6c0",
+                "responses": {
+                    "200": {
+                        "description": "Lista de solicitudes obtenida correctamente.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Solicitud"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Solicitudes"
+                ],
+                "summary": "Crear nueva solicitud",
+                "description": "Registra una nueva solicitud de préstamo para un cliente (requiere autenticación).",
+                "operationId": "07c5e9e87e8656e1a46ae55e7e5a727a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "cliente_id",
+                                    "monto_solicitado",
+                                    "plazo_meses",
+                                    "tasa_interes"
+                                ],
+                                "properties": {
+                                    "cliente_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "monto_solicitado": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 15000.5
+                                    },
+                                    "plazo_meses": {
+                                        "type": "integer",
+                                        "example": 12
+                                    },
+                                    "tasa_interes": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 12.5
+                                    },
+                                    "observaciones": {
+                                        "type": "string",
+                                        "example": "Cliente solicita préstamo para vehículo"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Solicitud creada correctamente"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/solicitudes/{id}": {
+            "get": {
+                "tags": [
+                    "Solicitudes"
+                ],
+                "summary": "Obtener solicitud específica",
+                "description": "Obtiene los detalles de una solicitud de préstamo específica (requiere autenticación).",
+                "operationId": "d7fd9e42643919feb14c753698ca75b7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la solicitud a consultar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Solicitud encontrada"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Solicitudes"
+                ],
+                "summary": "Actualizar solicitud",
+                "description": "Modifica una solicitud existente (por ejemplo, aprobar o rechazar).",
+                "operationId": "3a9425b677c6d8c04a9dcee0a60acf00",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Solicitud actualizada correctamente"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Solicitudes"
+                ],
+                "summary": "Eliminar solicitud",
+                "description": "Elimina una solicitud si aún no tiene préstamo aprobado (requiere autenticación).",
+                "operationId": "0c67aa5acf3f079065fb170e0b3de8ad",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Solicitud eliminada correctamente"
+                    },
+                    "404": {
+                        "description": "Solicitud no encontrada"
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -528,6 +745,66 @@
                     }
                 },
                 "type": "object"
+            },
+            "Solicitud": {
+                "required": [
+                    "cliente_id",
+                    "monto_solicitado",
+                    "plazo_meses",
+                    "tasa_interes"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "cliente_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "monto_solicitado": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 15000.5
+                    },
+                    "plazo_meses": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "tasa_interes": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 12.5
+                    },
+                    "estado": {
+                        "type": "string",
+                        "example": "EN PROCESO"
+                    },
+                    "observaciones": {
+                        "type": "string",
+                        "example": "Solicitud para compra de vehículo."
+                    },
+                    "usuario_crea": {
+                        "type": "string",
+                        "example": "admin"
+                    },
+                    "usuario_actualiza": {
+                        "type": "string",
+                        "example": "operador1"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "cliente": {
+                        "$ref": "#/components/schemas/Cliente"
+                    }
+                },
+                "type": "object"
             }
         },
         "securitySchemes": {
@@ -546,6 +823,10 @@
         {
             "name": "Clientes",
             "description": "Gestión de clientes del sistema"
+        },
+        {
+            "name": "Solicitudes",
+            "description": "Gestión de solicitudes de préstamos"
         }
     ]
 }

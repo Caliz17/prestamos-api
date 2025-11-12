@@ -15,6 +15,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /* Cliente resource routes */
     Route::apiResource('clientes', App\Http\Controllers\Api\ClienteController::class);
+    /* Solicitud resource routes */
+    Route::apiResource('solicitudes', App\Http\Controllers\Api\SolicitudController::class);
 });
 
 
