@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use OpenApi\Attributes as OA;
+use Illuminate\Support\Facades\Password;
 
 #[OA\Tag(name: 'Auth', description: 'Autenticación de usuarios')]
 class AuthController extends Controller
@@ -170,4 +171,109 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+    #[OA\Post(
+        path: '/api/forgot-password',
+        summary: 'Solicitar restablecimiento de contraseña',
+        description: 'Envía un enlace de restablecimiento de contraseña al correo del usuario.',
+        tags: ['Auth'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', example: 'juan@example.com'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Correo enviado correctamente',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'Se ha enviado el enlace de restablecimiento.')
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: 'Error de validación')
+        ]
+    )]
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            throw ValidationException::withMessages([
+                'email' => 'No se pudo enviar el enlace a ese correo.'
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Se ha enviado el enlace de restablecimiento.'
+        ]);
+    }
+
+    #[OA\Post(
+        path: '/api/reset-password',
+        summary: 'Restablecer contraseña',
+        description: 'Restablece la contraseña usando un token previamente enviado.',
+        tags: ['Auth'],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['email', 'token', 'password', 'password_confirmation'],
+                properties: [
+                    new OA\Property(property: 'email', type: 'string', format: 'email', example: 'juan@example.com'),
+                    new OA\Property(property: 'token', type: 'string', example: 'abc123'),
+                    new OA\Property(property: 'password', type: 'string', example: 'newpassword123'),
+                    new OA\Property(property: 'password_confirmation', type: 'string', example: 'newpassword123'),
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Contraseña restablecida correctamente',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'message', type: 'string', example: 'Contraseña actualizada correctamente.')
+                    ]
+                )
+            ),
+            new OA\Response(response: 422, description: 'Token inválido o datos incorrectos')
+        ]
+    )]
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->save();
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            throw ValidationException::withMessages([
+                'email' => 'La información proporcionada no es válida o el token ha expirado.'
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Contraseña actualizada correctamente.'
+        ]);
+    }
+
 }

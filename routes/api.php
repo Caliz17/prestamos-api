@@ -7,10 +7,16 @@ use App\Http\Controllers\Api\ClienteController;
 use App\Http\Controllers\Api\SolicitudController;
 use App\Http\Controllers\Api\PrestamoController;
 use App\Http\Controllers\Api\PagoController;
+use App\Http\Controllers\Api\PasswordResetController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'show'])
+     ->name('password.reset');
 
 Route::middleware('auth:sanctum')->group(function () {
     /* Protected routes */
@@ -34,5 +40,3 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('pagos/cliente/{cliente_id}', [PagoController::class, 'pagosPorCliente']);
 
 });
-
-
