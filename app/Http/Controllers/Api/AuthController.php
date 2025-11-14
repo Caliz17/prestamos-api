@@ -256,18 +256,32 @@ class AuthController extends Controller
             'password' => 'required|min:6|confirmed',
         ]);
 
+        \Log::info('Reset password attempt', [
+            'email' => $request->email,
+            'token_received' => $request->token,
+        ]);
+
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $user->forceFill([
                     'password' => Hash::make($password)
                 ])->save();
+
+                \Log::info('Password updated for user', ['user_id' => $user->id]);
             }
         );
 
+        \Log::info('Password reset status', ['status' => $status]);
+
         if ($status !== Password::PASSWORD_RESET) {
+            \Log::error('Password reset failed', [
+                'status' => $status,
+                'email' => $request->email
+            ]);
+            
             throw ValidationException::withMessages([
-                'email' => 'La información proporcionada no es válida o el token ha expirado.'
+                'email' => __($status) // Usar el mensaje traducido de Laravel
             ]);
         }
 
@@ -275,5 +289,4 @@ class AuthController extends Controller
             'message' => 'Contraseña actualizada correctamente.'
         ]);
     }
-
 }
