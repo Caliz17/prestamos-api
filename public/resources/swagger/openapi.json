@@ -583,6 +583,50 @@
                 ]
             }
         },
+        "/api/clientes/datos": {
+            "get": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Obtener datos estadísticos de clientes",
+                "description": "Devuelve estadísticas sobre los clientes, incluyendo el total, los que tienen préstamos y los nuevos en el mes actual.",
+                "operationId": "739ed5dbeebda463312a54ce7d1cc769",
+                "responses": {
+                    "200": {
+                        "description": "Datos estadísticos de clientes obtenidos correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "total_clientes": {
+                                            "type": "integer",
+                                            "example": 100
+                                        },
+                                        "clientes_con_prestamos": {
+                                            "type": "integer",
+                                            "example": 75
+                                        },
+                                        "clientes_nuevos_mes": {
+                                            "type": "integer",
+                                            "example": 5
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/pagos": {
             "get": {
                 "tags": [

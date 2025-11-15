@@ -46,4 +46,9 @@ class Solicitud extends Model
     {
         return $this->belongsTo(Cliente::class);
     }
+
+    public function prestamo()
+    {
+        return $this->hasOne(Prestamo::class);
+    }
 }

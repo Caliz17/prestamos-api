@@ -25,6 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     /* Cliente resource routes */
     Route::apiResource('clientes', App\Http\Controllers\Api\ClienteController::class);
+    Route::get('clientes/datos', [ClienteController::class, 'datosClientes']);
     /* Solicitud resource routes */
     Route::apiResource('solicitudes', App\Http\Controllers\Api\SolicitudController::class);
     Route::put('solicitudes/{id}/aprobar', [SolicitudController::class, 'aprobar']);

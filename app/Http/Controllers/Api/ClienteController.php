@@ -41,11 +41,29 @@ class ClienteController extends Controller
     public function index()
     {
         try {
-            $clientes = Cliente::orderBy('id', 'desc')->get();
+            $totalClientes = Cliente::count();
+
+            // Contar clientes con préstamos (usando la relación)
+            $clientesConPrestamos = Cliente::whereHas('solicitudes', function ($query) {
+                $query->whereHas('prestamo');
+            })->count();
+
+            $clientesNuevosMes = Cliente::whereMonth('created_at', now()->month)->count();
+
+            $clientes = Cliente::with(['solicitudes.prestamo']) // Cargar relaciones
+                ->orderBy('id', 'desc')
+                ->get();
+
             return response()->json([
                 'status' => 'success',
-                'data' => $clientes,
+                'data' => [
+                    'total_clientes' => $totalClientes,
+                    'clientes_con_prestamos' => $clientesConPrestamos,
+                    'clientes_nuevos_mes' => $clientesNuevosMes,
+                    'clientes' => $clientes,
+                ],
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
@@ -91,9 +109,15 @@ class ClienteController extends Controller
     {
         $validated = $request->validate([
             'primer_nombre' => 'required|string|max:100',
+            'segundo_nombre' => 'nullable|string|max:100',
             'primer_apellido' => 'required|string|max:100',
+            'segundo_apellido' => 'nullable|string|max:100',
             'dpi' => 'required|string|unique:clientes,dpi',
             'nit' => 'required|string|unique:clientes,nit',
+            'fecha_nacimiento' => 'required|date',
+            'correo' => 'nullable|email',
+            'telefono' => 'nullable|string',
+            'direccion' => 'nullable|string',
         ]);
 
         Cliente::create($validated);
@@ -200,4 +224,5 @@ class ClienteController extends Controller
 
         return response()->json(['status' => 'success', 'message' => 'Cliente eliminado correctamente.'], 200);
     }
+
 }

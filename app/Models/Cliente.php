@@ -23,6 +23,7 @@ use OpenApi\Attributes as OA;
         new OA\Property(property: 'direccion', type: 'string', example: 'Ciudad de Guatemala, Zona 1'),
         new OA\Property(property: 'correo', type: 'string', format: 'email', example: 'juan.perez@example.com'),
         new OA\Property(property: 'telefono', type: 'string', example: '5555-1234'),
+        new OA\Property(property: 'solicitudes', type: 'array', items: new OA\Items(ref: '#/components/schemas/Solicitud')),
     ]
 )]
 class Cliente extends Model
@@ -43,4 +44,38 @@ class Cliente extends Model
         'usuario_crea',
         'usuario_actualiza',
     ];
+
+    // AGREGAR ESTAS RELACIONES:
+
+    /**
+     * Relación con las solicitudes del cliente
+     */
+    public function solicitudes()
+    {
+        return $this->hasMany(Solicitud::class);
+    }
+
+    /**
+     * Relación con préstamos a través de solicitudes
+     */
+    public function prestamos()
+    {
+        return $this->hasManyThrough(Prestamo::class, Solicitud::class);
+    }
+
+    /**
+     * Scope para clientes con préstamos activos
+     */
+    public function scopeConPrestamos($query)
+    {
+        return $query->whereHas('solicitudes.prestamo');
+    }
+
+    /**
+     * Scope para clientes nuevos del mes
+     */
+    public function scopeNuevosEsteMes($query)
+    {
+        return $query->whereMonth('created_at', now()->month);
+    }
 }
