@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\SolicitudController;
 use App\Http\Controllers\Api\PrestamoController;
 use App\Http\Controllers\Api\PagoController;
 use App\Http\Controllers\Api\PasswordResetController;
+use App\Http\Controllers\Api\DashboardController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -39,5 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('pagos', App\Http\Controllers\Api\PagoController::class);
     Route::get('pagos/prestamo/{prestamo_id}', [PagoController::class, 'pagosPorPrestamo']);
     Route::get('pagos/cliente/{cliente_id}', [PagoController::class, 'pagosPorCliente']);
+
+    /* Dashboard route */
+    Route::get('dashboard', [DashboardController::class, 'index']);
 
 });
